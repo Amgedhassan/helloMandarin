@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Mandarin - Your Shanshui</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://css.gg/css?=|search|arrow-right|award|close" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #1F2937; /* Dark Gray */
+        }
+        #app-container {
+            background: #F9FAFB; /* Light Gray Background */
+            overflow: hidden;
+        }
+        #shanshui-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.5;
+            filter: blur(1px);
+        }
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.5); /* Semi-transparent white */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .screen { display: none; position: relative; z-index: 1; }
+        .screen.active { display: flex; }
+        .chat-bubble-user { background-color: #FECDD3; color: #881337; } /* Brand Pink */
+        .chat-bubble-ai { background-color: #F3F4F6; color: #1F2937; } /* Light Gray */
+        .transition-enter { animation: fadeIn 0.5s ease-out forwards; }
+        .transition-leave { animation: fadeOut 0.5s ease-in forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+        .font-brush { font-family: 'Zhi Mang Xing', cursive; }
+        
+        /* Modal Styles */
+        #how-it-works-modal {
+            transition: opacity 0.3s ease-out;
+        }
+        #how-it-works-modal .modal-content {
+            transform: scale(0.95) translateY(10px);
+            opacity: 0;
+            transition: all 0.3s ease-out;
+        }
+        #how-it-works-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #how-it-works-modal.active .modal-content {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+        /* Staggered animation for modal items */
+        #how-it-works-modal.active .modal-item {
+            animation: fadeIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        #how-it-works-modal.active .modal-item:nth-child(1) { animation-delay: 0.1s; }
+        #how-it-works-modal.active .modal-item:nth-child(2) { animation-delay: 0.2s; }
+        #how-it-works-modal.active .modal-item:nth-child(3) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+
+    <div id="app-container" class="relative h-screen w-full">
+        <div id="shanshui-container"></div>
+
+        <!-- Screen 1: Dashboard -->
+        <main id="screen-dashboard" class="screen active flex-col w-full h-full p-6 md:p-10 transition-enter">
+            <header class="flex items-center justify-between w-full max-w-7xl mx-auto">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 flex items-center justify-center">
+                        <svg viewBox="0 0 100 100" class="w-10 h-10">
+                            <path d="M 30 20 C 40 25, 60 25, 70 20" stroke="#F472B6" stroke-width="8" fill="none" stroke-linecap="round"/>
+                            <path d="M 50 20 V 80" stroke="#F472B6" stroke-width="8" fill="none" stroke-linecap="round"/>
+                            <path d="M 35 80 H 65" stroke="#F472B6" stroke-width="8" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-3xl font-bold text-gray-800 font-brush tracking-wider">Hello Mandarin</h1>
+                </div>
+                <div class="flex items-center space-x-6">
+                     <div class="text-right">
+                        <p class="font-semibold text-gray-800">Amgad</p>
+                        <p class="font-semibold text-pink-600 text-sm">Flourishing Talent (秀才)</p>
+                    </div>
+                    <img src="https://placehold.co/48x48/F472B6/FFFFFF?text=A" alt="User Avatar" class="w-12 h-12 rounded-full" onerror="this.onerror=null;this.src='https://placehold.co/48x48/E0E0E0/000000?text=A';">
+                </div>
+            </header>
+
+            <div class="flex-1 flex flex-col items-center justify-center">
+                <div class="w-full max-w-2xl text-center">
+                    <h2 class="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight">Begin Your Journey</h2>
+                    <p class="font-brush text-3xl text-pink-500 mt-2">开启你的旅程</p>
+                    
+                    <div class="relative mt-8">
+                        <input type="text" id="purpose-input" placeholder="What is your mission?" class="glassmorphism w-full p-6 pl-14 text-xl rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-800 placeholder-gray-500">
+                        <i class="gg-search" style="position: absolute; left: 24px; top: 50%; transform: translateY(-50%); color: #9CA3AF;"></i>
+                    </div>
+
+                    <div class="mt-6 flex flex-wrap items-center justify-center gap-4">
+                        <button class="suggestion-btn glassmorphism py-3 px-6 rounded-full border-2 border-transparent hover:border-pink-500 transition-all" data-purpose="Ordering coffee (点咖啡)">☕ Ordering coffee <span class="text-gray-500 ml-2">(点咖啡)</span></button>
+                        <button class="suggestion-btn glassmorphism py-3 px-6 rounded-full border-2 border-transparent hover:border-pink-500 transition-all" data-purpose="Asking for directions (问路)">🗺️ Asking for directions <span class="text-gray-500 ml-2">(问路)</span></button>
+                    </div>
+                    
+                    <button id="how-it-works-btn" class="mt-12 glassmorphism py-3 px-6 rounded-full font-semibold text-gray-700 hover:text-pink-600 hover:ring-2 hover:ring-pink-400 transition-all">How does the Path of the Scholar work?</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Screen 2: Active Conversation -->
+        <main id="screen-chat" class="screen flex-col w-full h-full">
+            <header class="flex-shrink-0 p-4 flex items-center glassmorphism">
+                <button id="back-to-dashboard" class="p-2 text-gray-500 hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+                <div id="chat-header-icon" class="w-12 h-12 bg-pink-500/10 rounded-full flex items-center justify-center ml-4"><span class="text-2xl">🥡</span></div>
+                <h2 id="chat-header-title" class="text-xl font-bold ml-4 text-gray-800">Ordering Take-out</h2>
+            </header>
+            <div class="flex-1 p-6 overflow-y-auto space-y-8 flex flex-col">
+                <div class="chat-bubble-ai self-start max-w-lg p-4 rounded-2xl rounded-bl-none">いらっしゃいませ。</div>
+                <div class="chat-bubble-user self-end max-w-lg p-4 rounded-2xl rounded-br-none">こんにちは、ビッグマックをひとつと、フレンチフライをLサイズで<strong class="underline cursor-pointer">おねがいします</strong>。</div>
+                <div class="chat-bubble-ai self-start max-w-lg p-4 rounded-2xl rounded-bl-none">てんないでおめしあがりですか。</div>
+            </div>
+            <footer class="flex-shrink-0 p-4 glassmorphism">
+                <div class="flex items-center space-x-4 max-w-4xl mx-auto">
+                    <input type="text" placeholder="Respond in Mandarin..." class="flex-1 p-4 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-800">
+                    <button class="p-4 bg-gray-200 rounded-xl text-gray-600 hover:bg-gray-300"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button>
+                    <button class="p-4 bg-pink-500 text-white rounded-xl hover:bg-pink-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
+                </div>
+            </footer>
+        </main>
+        
+        <!-- How It Works Modal -->
+        <div id="how-it-works-modal" class="screen fixed inset-0 bg-black/30 items-center justify-center p-6 opacity-0 pointer-events-none">
+            <div class="modal-content glassmorphism max-w-2xl w-full p-8 rounded-3xl relative">
+                <button id="close-modal-btn" class="absolute top-6 right-6 p-2 text-gray-500 hover:bg-gray-200 rounded-full transition-colors"><i class="gg-close"></i></button>
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">The Path of the Scholar</h2>
+                    <p class="font-brush text-2xl text-pink-500 mb-8">学士之路</p>
+                </div>
+                <div class="space-y-6 text-left">
+                    <div class="modal-item p-4 rounded-lg hover:bg-white/50 transition-colors">
+                        <h3 class="font-bold text-xl text-gray-800 mb-2">Ranks of Accomplishment</h3>
+                        <p class="text-gray-600">Progress from a <span class="font-semibold text-gray-700">Novice (童生)</span> to a <span class="font-semibold text-gray-700">Top Scholar (状元)</span>. Each rank you achieve enhances your personal Shanshui world with new, beautiful elements like bridges and pavilions.</p>
+                    </div>
+                    <div class="modal-item p-4 rounded-lg hover:bg-white/50 transition-colors">
+                        <h3 class="font-bold text-xl text-gray-800 mb-2">The Lotus of Consistency</h3>
+                        <p class="text-gray-600">For every consecutive day you practice, a petal will unfurl on your personal lotus flower. Maintain your streak to keep it in full bloom, a beautiful symbol of your dedication.</p>
+                    </div>
+                    <div class="modal-item p-4 rounded-lg hover:bg-white/50 transition-colors">
+                        <h3 class="font-bold text-xl text-gray-800 mb-2">Seals of Mastery</h3>
+                        <p class="text-gray-600">Mastering key skills, like food vocabulary or travel phrases, will earn you elegant, artistic seals. Collect them all to showcase your diverse knowledge.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 3D Shanshui Setup ---
+        const container = document.getElementById('shanshui-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        scene.fog = new THREE.FogExp2(0xF9FAFB, 0.1);
+
+        const planeGeometry = new THREE.PlaneGeometry(100, 100, 100, 100);
+        const vertices = planeGeometry.attributes.position.array;
+        for (let i = 2; i < vertices.length; i += 3) {
+            vertices[i] = Math.random() * 2;
+        }
+        planeGeometry.attributes.position.needsUpdate = true;
+        
+        const planeMaterial = new THREE.MeshPhongMaterial({
+            color: 0xcccccc, // Lighter gray for terrain
+            shininess: 0,
+            flatShading: true,
+            transparent: true,
+            opacity: 0.8
+        });
+        const terrain = new THREE.Mesh(planeGeometry, planeMaterial);
+        terrain.rotation.x = -Math.PI / 2;
+        scene.add(terrain);
+
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(0, 1, 1);
+        scene.add(light);
+        
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+
+        camera.position.set(0, 1.5, 6);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            terrain.position.z += 0.005;
+            if(terrain.position.z > 10) terrain.position.z = -10;
+            renderer.render(scene, camera);
+        }
+        animate();
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- UI Navigation ---
+        const dashboardScreen = document.getElementById('screen-dashboard');
+        const chatScreen = document.getElementById('screen-chat');
+        const backBtn = document.getElementById('back-to-dashboard');
+        const suggestionBtns = document.querySelectorAll('.suggestion-btn');
+        const purposeInput = document.getElementById('purpose-input');
+        const chatHeaderTitle = document.getElementById('chat-header-title');
+        const chatHeaderIcon = document.querySelector('#chat-header-icon span');
+        const howItWorksBtn = document.getElementById('how-it-works-btn');
+        const howItWorksModal = document.getElementById('how-it-works-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+
+        function switchScreen(hideScreen, showScreen) {
+            hideScreen.classList.add('transition-leave');
+            setTimeout(() => {
+                hideScreen.classList.remove('active', 'transition-leave');
+                showScreen.classList.add('active', 'transition-enter');
+                setTimeout(() => showScreen.classList.remove('transition-enter'), 500);
+            }, 500);
+        }
+
+        function startConversation(title, icon) {
+            chatHeaderTitle.textContent = title.split('(')[0].trim();
+            chatHeaderIcon.textContent = icon;
+            switchScreen(dashboardScreen, chatScreen);
+        }
+        
+        suggestionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const purpose = btn.dataset.purpose;
+                const icon = btn.textContent.split(' ')[0];
+                startConversation(purpose, icon);
+            });
+        });
+
+        purposeInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && this.value.trim() !== '') {
+                startConversation(this.value.trim(), '💬');
+            }
+        });
+
+        backBtn.addEventListener('click', () => switchScreen(chatScreen, dashboardScreen));
+
+        // Modal Logic
+        howItWorksBtn.addEventListener('click', () => {
+            howItWorksModal.classList.add('active');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            howItWorksModal.classList.remove('active');
+        });
+        
+        howItWorksModal.addEventListener('click', (e) => {
+            if(e.target === howItWorksModal) {
+                 howItWorksModal.classList.remove('active');
+            }
+        });
+
+    </script>
+</body>
+</html>
